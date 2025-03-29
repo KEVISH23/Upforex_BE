@@ -1,0 +1,38 @@
+import mongoose from "mongoose";
+
+const blogSchema = new mongoose.Schema(
+  {
+    title: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    metaTitle: {
+      type: String,
+      trim: true,
+    },
+    description: {
+      type: String,
+      trim: true,
+    },
+    content: {
+      type: String,
+      required: true,
+    },
+    imageUrl: {
+      type: String,
+      trim: true,
+    },
+    videoUrl: {
+      type: String,
+      trim: true,
+    },
+    textField: {
+      type: String,
+      trim: true,
+    },
+  },
+  { timestamps: true }
+);
+const Blog = mongoose.model("Blog", blogSchema);
+export { Blog };

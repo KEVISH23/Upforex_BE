@@ -2,8 +2,8 @@ import jwt from "jsonwebtoken";
 
 const JWT_SECRET = "UpFoRexTradIng123456";
 
-export const generateToken = (payload, expiresIn = "1h") => {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn });
+export const generateToken = (payload) => {
+  return jwt.sign(payload, JWT_SECRET);
 };
 
 export const verifyToken = (token) => {
