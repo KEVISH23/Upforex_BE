@@ -9,11 +9,12 @@ export const upload = multer({
     bucket: process.env.BUCKET_NAME,
     contentType: multerS3.AUTO_CONTENT_TYPE,
     key: (req, file, cb) => {
+      const { type } = req.headers;
       const fileExtension = file.originalname.split(".").pop();
       const fileName = `${Date.now()}-${Math.round(
         Math.random() * 1e9
       )}.${fileExtension}`;
-      cb(null, `uploads/${fileName}`);
+      cb(null, `uploads/${type}/${fileName}`);
     },
   }),
   fileFilter: (req, file, cb) => {
