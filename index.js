@@ -24,3 +24,10 @@ app.post("/api/v1/upforex/contact-us", async (req, res) => {
     res.json({ staus: false, message: error.message });
   }
 });
+app.use((err, req, res, next) => {
+  res.status(500).json({
+    status: false,
+    message: err.message || "An error occurred during file upload.",
+    data: null,
+  });
+});
