@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
+import dotenv from "dotenv";
+dotenv.config();
 mongoose
-  .connect(
-    "mongodb+srv://upforex:poeVcnnf1Ksanf5i@cluster0.4ic7bux.mongodb.net/uppforex"
-  )
+  .connect(process.env.DBURL)
   .then(() => console.log("DB Connected"))
   .catch((err) => console.log("Error in connecting DB ", err));
