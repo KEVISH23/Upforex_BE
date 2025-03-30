@@ -2,6 +2,7 @@ import express from "express";
 import {
   createAdmin,
   deleteAdmin,
+  deleteFile,
   getAdminById,
   getAllAdmins,
   login,
@@ -36,4 +37,5 @@ adminRouter.post("/upload", upload.single("file"), (req, res) => {
     },
   });
 });
+adminRouter.post("/delete-file", deleteFile);
 export { adminRouter };

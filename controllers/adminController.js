@@ -1,6 +1,8 @@
 import { Admin } from "../models/index.js";
 import { generateToken } from "../utils/index.js";
 import { baseListQuery } from "../queries/index.js";
+import s3 from "../s3Config.js";
+import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -149,6 +151,24 @@ export const deleteAdmin = async (req, res) => {
       status: true,
       message: "Admin deleted successfully.",
       data: deletedAdmin,
+    });
+  } catch (error) {
+    res.json({ status: false, message: error.message, data: null });
+  }
+};
+
+export const deleteFile = async (req, res) => {
+  try {
+    const { key } = req.body;
+    const params = new DeleteObjectCommand({
+      Bucket: process.env.BUCKET_NAME,
+      Key: key,
+    });
+    await s3.send(params);
+    res.json({
+      status: true,
+      message: "File deleted successfully.",
+      data: null,
     });
   } catch (error) {
     res.json({ status: false, message: error.message, data: null });
