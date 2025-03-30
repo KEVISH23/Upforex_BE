@@ -3,6 +3,7 @@ import { generateToken } from "../utils/index.js";
 import { baseListQuery } from "../queries/index.js";
 import s3 from "../s3Config.js";
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
+import bcrypt from "bcrypt";
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -117,9 +118,14 @@ export const getAdminById = async (req, res) => {
 
 export const updateAdmin = async (req, res) => {
   try {
+    if (req.body.password) {
+      req.body.password = await bcrypt.hash(updateData.password, 10);
+    }
     const updatedAdmin = await Admin.findByIdAndUpdate(
       req.params.id,
-      req.body,
+      {
+        $set: req.body,
+      },
       { new: true }
     );
     if (!updatedAdmin)
