@@ -19,11 +19,24 @@ export const createCategory = async (req, res) => {
 
 export const getAllCategories = async (req, res) => {
   try {
-    const categories = await Category.find();
+    const { pageNum, pageLimit, allCategories } = req.query;
+    const skip = (pageNum - 1) * pageLimit;
+    const query = baseListQuery([], req.query, ["name"], {
+      search: true,
+    });
+    const totalDocs = await Category.aggregate(query);
+    const categories = await Category.aggregate(query)
+      .skip(skip)
+      .limit(Number(pageLimit));
     res.json({
       status: true,
       message: "Categories fetched successfully!",
-      data: categories,
+      data: allCategories ? totalDocs : categories,
+      metaData: {
+        totalPage: Math.ceil(totalDocs.length / Number(pageLimit)),
+        pageNum: Number(pageNum),
+        pageLimit: Number(pageLimit),
+      },
     });
   } catch (error) {
     res.status(500).json({

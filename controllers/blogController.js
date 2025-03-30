@@ -1,4 +1,9 @@
 import { Blog } from "../models/index.js";
+import {
+  baseListQuery,
+  blogSearchFields,
+  blogsQuery,
+} from "../queries/index.js";
 
 export const createBlog = async (req, res) => {
   try {
@@ -20,11 +25,25 @@ export const createBlog = async (req, res) => {
 
 export const getAllBlogs = async (req, res) => {
   try {
-    const blogs = await Blog.find();
+    const { pageNum = 1, pageLimit = 10 } = req.query;
+    const skip = (pageNum - 1) * pageLimit;
+    // const blogs = await Blog.find().skip(skip).limit(pageLimit);
+    const query = baseListQuery(blogsQuery, req.query, blogSearchFields, {
+      search: true,
+    });
+    const totalDocs = await Blog.aggregate(query);
+    const blogs = await Blog.aggregate(query)
+      .skip(skip)
+      .limit(Number(pageLimit));
     res.json({
       status: true,
       message: "Blogs fetched successfully!",
       data: blogs,
+      metaData: {
+        totalPage: Math.ceil(totalDocs.length / Number(pageLimit)),
+        pageNum: Number(pageNum),
+        pageLimit: Number(pageLimit),
+      },
     });
   } catch (error) {
     res.json({

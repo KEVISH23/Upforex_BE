@@ -48,7 +48,7 @@ export const login = async (req, res) => {
 
 export const createAdmin = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, name } = req.body;
     const existingAdmin = await Admin.findOne({ email });
     if (existingAdmin)
       return res.json({
@@ -57,7 +57,7 @@ export const createAdmin = async (req, res) => {
         data: null,
       });
 
-    const admin = await Admin.create({ email, password });
+    const admin = await Admin.create({ email, password, name });
     res.json({
       status: true,
       message: "Admin created successfully!",
@@ -70,11 +70,24 @@ export const createAdmin = async (req, res) => {
 
 export const getAllAdmins = async (req, res) => {
   try {
-    const admins = await Admin.find();
+    const { pageNum, pageLimit } = req.query;
+    const skip = (pageNum - 1) * pageLimit;
+    const query = baseListQuery([], req.query, ["email", "name"], {
+      search: true,
+    });
+    const totalDocs = await Admin.aggregate(query);
+    const admins = await Admin.aggregate(query)
+      .skip(skip)
+      .limit(Number(pageLimit));
     res.json({
       status: true,
       message: "Admins fetched successfully.",
       data: admins,
+      metaData: {
+        totalPage: Math.ceil(totalDocs.length / Number(pageLimit)),
+        pageNum: Number(pageNum),
+        pageLimit: Number(pageLimit),
+      },
     });
   } catch (error) {
     res.json({ status: false, message: error.message, data: null });
