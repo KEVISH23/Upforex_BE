@@ -40,7 +40,7 @@ export const getAllBlogs = async (req, res) => {
       message: "Blogs fetched successfully!",
       data: blogs,
       metaData: {
-        totalPage: Math.ceil(totalDocs.length / Number(pageLimit)),
+        totalPage: totalDocs.length,
         pageNum: Number(pageNum),
         pageLimit: Number(pageLimit),
       },

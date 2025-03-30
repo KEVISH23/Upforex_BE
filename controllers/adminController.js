@@ -88,7 +88,7 @@ export const getAllAdmins = async (req, res) => {
       message: "Admins fetched successfully.",
       data: admins,
       metaData: {
-        totalPage: Math.ceil(totalDocs.length / Number(pageLimit)),
+        totalPage: totalDocs.length,
         pageNum: Number(pageNum),
         pageLimit: Number(pageLimit),
       },
