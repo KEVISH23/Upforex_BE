@@ -27,7 +27,7 @@ export const authMiddleware = async (req, res, next) => {
     const admin = await Admin.findById(decoded.id);
 
     if (!admin) {
-      return res.json({
+      return res.status(401).json({
         status: false,
         message: "Invalid Token",
         data: null,
