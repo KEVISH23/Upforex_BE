@@ -41,6 +41,7 @@ export const login = async (req, res) => {
       data: {
         token,
         name: admin.name,
+        id: admin._id,
       },
     });
   } catch (error) {
