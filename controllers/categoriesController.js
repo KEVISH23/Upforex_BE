@@ -1,4 +1,5 @@
 import { Category } from "../models/index.js";
+import { baseListQuery } from "../queries/index.js";
 
 export const createCategory = async (req, res) => {
   try {

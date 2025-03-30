@@ -8,5 +8,6 @@ export const baseListQuery = (query, params, searchFields, options) => {
       baseQuery.push({ $match: { $or: searchQuery } });
     }
   }
+  baseQuery.push({ $sort: { createdAt: -1 } });
   return baseQuery;
 };

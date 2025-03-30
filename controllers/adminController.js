@@ -1,6 +1,6 @@
 import { Admin } from "../models/index.js";
 import { generateToken } from "../utils/index.js";
-
+import { baseListQuery } from "../queries/index.js";
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
