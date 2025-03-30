@@ -128,6 +128,7 @@ export const updateAdmin = async (req, res) => {
         message: "Admin not found.",
         data: null,
       });
+    delete updateAdmin.password;
     res.json({
       status: true,
       message: "Admin updated successfully.",
