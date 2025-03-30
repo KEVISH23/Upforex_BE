@@ -119,7 +119,7 @@ export const getAdminById = async (req, res) => {
 export const updateAdmin = async (req, res) => {
   try {
     if (req.body.password) {
-      req.body.password = await bcrypt.hash(updateData.password, 10);
+      req.body.password = await bcrypt.hash(req.body.password, 10);
     }
     const updatedAdmin = await Admin.findByIdAndUpdate(
       req.params.id,
