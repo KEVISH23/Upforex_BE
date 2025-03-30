@@ -37,7 +37,7 @@ export const login = async (req, res) => {
       message: "Login successful!",
       data: {
         token,
-        email: admin.email,
+        name: admin.name,
       },
     });
   } catch (error) {
