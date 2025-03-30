@@ -5,7 +5,7 @@ export const authMiddleware = async (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader) {
-    return res.json({
+    return res.status(401).json({
       status: false,
       message: "No token provided.",
       data: null,
@@ -15,7 +15,7 @@ export const authMiddleware = async (req, res, next) => {
   const token = authHeader.split(" ")[1];
 
   if (!token) {
-    return res.json({
+    return res.status(401).json({
       status: false,
       message: "Invalid token format.",
       data: null,
@@ -36,7 +36,7 @@ export const authMiddleware = async (req, res, next) => {
     req.user = decoded;
     next();
   } catch (error) {
-    res.json({
+    res.status(401).json({
       status: false,
       message: "Invalid or expired token.",
       data: null,
