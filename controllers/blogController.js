@@ -20,7 +20,7 @@ export const createBlog = async (req, res) => {
 
 export const getAllBlogs = async (req, res) => {
   try {
-    const [blogs] = await Blog.find();
+    const blogs = await Blog.find();
     res.json({
       status: true,
       message: "Blogs fetched successfully!",
@@ -51,6 +51,30 @@ export const updateBlog = async (req, res) => {
       status: true,
       message: "Blog updated successfully!",
       data: updatedBlog,
+    });
+  } catch (error) {
+    res.json({
+      status: false,
+      message: error.message,
+      data: null,
+    });
+  }
+};
+
+export const getBlogById = async (req, res) => {
+  try {
+    const blog = await Blog.findById(req.params.id);
+    if (!blog) {
+      return res.json({
+        status: false,
+        message: "Blog not found!",
+        data: null,
+      });
+    }
+    res.json({
+      status: true,
+      message: "Blog fetched successfully!",
+      data: blog,
     });
   } catch (error) {
     res.json({

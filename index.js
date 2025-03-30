@@ -2,7 +2,7 @@ import express from "express";
 import * as nodemailer from "./nodemailer.js";
 import dotenv from "dotenv";
 import cors from "cors";
-import { adminRouter, blogRouter } from "./routes/index.js";
+import { adminRouter, blogRouter, categoryRouter } from "./routes/index.js";
 import "./dbConnect.js";
 dotenv.config();
 const app = express();
@@ -17,6 +17,7 @@ app.listen(process.env.PORT, () => {
 
 app.use("/api/v1/admin", adminRouter);
 app.use("/api/v1/blogs", blogRouter);
+app.use("/api/v1/categories", categoryRouter);
 app.post("/api/v1/upforex/contact-us", async (req, res) => {
   try {
     await nodemailer.sendMail(req.body);

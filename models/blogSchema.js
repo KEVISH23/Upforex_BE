@@ -31,6 +31,16 @@ const blogSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    categories: {
+      type: [mongoose.Types.ObjectId],
+      ref: "categories",
+    },
+    imageAltTag: {
+      type: String,
+    },
+    videoAltTag: {
+      type: String,
+    },
   },
   { timestamps: true }
 );
