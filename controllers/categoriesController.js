@@ -22,7 +22,7 @@ export const getAllCategories = async (req, res) => {
   try {
     const { pageNum, pageLimit, allCategories } = req.query;
     const skip = (pageNum - 1) * pageLimit;
-    const query = baseListQuery([], req.query, ["name"], {
+    const query = baseListQuery([], req.query, ["categoryName"], {
       search: true,
     });
     const totalDocs = await Category.aggregate(query);
