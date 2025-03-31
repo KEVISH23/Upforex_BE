@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { Blog } from "../models/index.js";
 import {
   baseListQuery,
@@ -82,7 +83,22 @@ export const updateBlog = async (req, res) => {
 
 export const getBlogById = async (req, res) => {
   try {
-    const blog = await Blog.findById(req.params.id);
+    // const blog = await Blog.findById(req.params.id);
+    const blog = await Blog.aggregate([
+      {
+        $match: {
+          _id: new mongoose.Types.ObjectId(req.params.id),
+        },
+      },
+      {
+        $lookup: {
+          from: "categories",
+          localField: "categories",
+          foreignField: "_id",
+          as: "categories",
+        },
+      },
+    ]);
     if (!blog) {
       return res.json({
         status: false,
