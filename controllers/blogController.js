@@ -103,3 +103,27 @@ export const getBlogById = async (req, res) => {
     });
   }
 };
+
+export const deleteBlog = async (req, res) => {
+  try {
+    const deletedBlog = await Blog.findByIdAndDelete(req.params.id);
+    if (!deletedBlog) {
+      return res.json({
+        status: false,
+        message: "Blog not found!",
+        data: null,
+      });
+    }
+    res.json({
+      status: true,
+      message: "Blog deleted successfully!",
+      data: deletedBlog,
+    });
+  } catch (error) {
+    res.json({
+      status: false,
+      message: error.message,
+      data: null,
+    });
+  }
+};

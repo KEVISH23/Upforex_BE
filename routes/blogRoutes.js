@@ -1,6 +1,7 @@
 import express from "express";
 import {
   createBlog,
+  deleteBlog,
   getAllBlogs,
   getBlogById,
   updateBlog,
@@ -13,5 +14,6 @@ blogRouter.post("/", createBlog);
 blogRouter.get("/", getAllBlogs);
 blogRouter.put("/:id", updateBlog);
 blogRouter.get("/:id", getBlogById);
+blogRouter.delete("/:id", deleteBlog);
 
 export { blogRouter };
