@@ -68,6 +68,13 @@ export const createAdmin = async (req, res) => {
       data: admin,
     });
   } catch (error) {
+    if (error.code === 11000) {
+      return res.status(500).json({
+        status: false,
+        message: "Email already exists",
+        data: null,
+      });
+    }
     res.json({ status: false, message: error.message, data: null });
   }
 };
