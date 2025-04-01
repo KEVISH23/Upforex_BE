@@ -5,6 +5,7 @@ import {
   blogSearchFields,
   blogsQuery,
 } from "../queries/index.js";
+import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 
 export const createBlog = async (req, res) => {
   try {
