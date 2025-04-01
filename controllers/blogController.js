@@ -6,7 +6,7 @@ import {
   blogsQuery,
 } from "../queries/index.js";
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
-
+import s3 from "../s3Config.js";
 export const createBlog = async (req, res) => {
   try {
     const blog = await Blog.create(req.body);
