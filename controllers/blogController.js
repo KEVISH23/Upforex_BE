@@ -123,6 +123,16 @@ export const getBlogById = async (req, res) => {
 export const deleteBlog = async (req, res) => {
   try {
     const deletedBlog = await Blog.findByIdAndDelete(req.params.id);
+    const imageUrl = new DeleteObjectCommand({
+      Bucket: process.env.BUCKET_NAME,
+      Key: deleteBlog.imageUrl,
+    });
+    await s3.send(imageUrl);
+    const params = new DeleteObjectCommand({
+      Bucket: process.env.BUCKET_NAME,
+      Key: deleteBlog.videoUrl,
+    });
+    await s3.send(params);
     if (!deletedBlog) {
       return res.json({
         status: false,
