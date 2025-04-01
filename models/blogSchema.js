@@ -41,6 +41,9 @@ const blogSchema = new mongoose.Schema(
     videoAltTag: {
       type: String,
     },
+    tags: {
+      type: [String],
+    },
   },
   { timestamps: true }
 );
