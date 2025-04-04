@@ -33,7 +33,7 @@ const blogSchema = new mongoose.Schema(
     },
     categories: {
       type: [mongoose.Types.ObjectId],
-      ref: "categories",
+      ref: "Category",
     },
     imageAltTag: {
       type: String,

@@ -4,6 +4,7 @@ import {
   deleteBlog,
   getAllBlogs,
   getBlogById,
+  getRecommendedBlogs,
   updateBlog,
 } from "../controllers/index.js";
 import { authMiddleware } from "../middlewares/index.js";
@@ -14,6 +15,7 @@ blogRouter.post("/", createBlog);
 blogRouter.get("/", getAllBlogs);
 blogRouter.put("/:id", updateBlog);
 blogRouter.get("/:id", getBlogById);
+blogRouter.get("/:id/recommended", getRecommendedBlogs);
 blogRouter.delete("/:id", deleteBlog);
 
 export { blogRouter };

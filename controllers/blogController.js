@@ -155,3 +155,51 @@ export const deleteBlog = async (req, res) => {
     });
   }
 };
+
+export const getRecommendedBlogs = async (req, res) => {
+  try {
+    const blog = await Blog.findById(req.params.id);
+
+    const relatedBlogs = await Blog.aggregate([
+      {
+        $match: {
+          _id: { $ne: blog._id },
+          $or: [
+            {
+              categories: {
+                $in: blog.categories,
+              },
+            },
+            {
+              tags: { $in: blog.tags },
+            },
+          ],
+        },
+      },
+      {
+        $project: {
+          title: 1,
+          imageUrl: 1,
+          videoUrl: 1,
+        },
+      },
+    ]);
+
+    const isEmpty = relatedBlogs.length === 0;
+
+    res.json({
+      status: true,
+      message: isEmpty
+        ? "No related blogs found!"
+        : "Blog fetched successfully!",
+      relatedBlogs,
+      blog,
+    });
+  } catch (error) {
+    res.json({
+      status: false,
+      message: error.message,
+      data: null,
+    });
+  }
+};
