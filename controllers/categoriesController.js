@@ -1,4 +1,5 @@
-import { Category } from "../models/index.js";
+import mongoose from "mongoose";
+import { Blog, Category } from "../models/index.js";
 import { baseListQuery } from "../queries/index.js";
 
 export const createCategory = async (req, res) => {
@@ -10,7 +11,6 @@ export const createCategory = async (req, res) => {
       data: category,
     });
   } catch (error) {
-    console.log("error", error);
     if (error.code === 11000) {
       return res.status(500).json({
         status: false,
@@ -112,6 +112,16 @@ export const updateCategory = async (req, res) => {
 
 export const deleteCategory = async (req, res) => {
   try {
+    const isAssociated = await Blog.findOne({
+      categories: { $in: new mongoose.Types.ObjectId(req.params.id) },
+    });
+    if (isAssociated) {
+      return res.json({
+        status: false,
+        message: "Cannot delete, Associated Somewhere",
+        data: null,
+      });
+    }
     const deletedCategory = await Category.findByIdAndDelete(req.params.id);
 
     if (!deletedCategory) {

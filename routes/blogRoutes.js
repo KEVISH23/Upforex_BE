@@ -3,14 +3,18 @@ import {
   createBlog,
   deleteBlog,
   getAllBlogs,
+  getAllBlogsForWeb,
   getBlogById,
-  getRecommendedBlogs,
+  getBlogByIdForWeb,
+  getRecommendedBlogsForWeb,
   updateBlog,
 } from "../controllers/index.js";
 import { authMiddleware } from "../middlewares/index.js";
 
 const blogRouter = express.Router();
-blogRouter.post("/:id/recommended", getRecommendedBlogs);
+blogRouter.get("/web/:id/recommended", getRecommendedBlogsForWeb);
+blogRouter.get("/web/:id", getBlogByIdForWeb);
+blogRouter.get("/web", getAllBlogsForWeb);
 
 blogRouter.use(authMiddleware);
 blogRouter.post("/", createBlog);

@@ -5,28 +5,8 @@ import {
   blogSearchFields,
   blogsQuery,
 } from "../queries/index.js";
-import { DeleteObjectCommand } from "@aws-sdk/client-s3";
-import s3 from "../s3Config.js";
 
-export const createBlog = async (req, res) => {
-  try {
-    const blog = await Blog.create(req.body);
-    if (!blog) throw new Error("Error in creating Blob");
-    res.json({
-      status: true,
-      message: "Blog created successfully!",
-      data: blog,
-    });
-  } catch (error) {
-    res.json({
-      status: false,
-      message: error.message,
-      data: null,
-    });
-  }
-};
-
-export const getAllBlogs = async (req, res) => {
+export const getAllBlogsForWeb = async (req, res) => {
   try {
     const { pageNum = 1, pageLimit = 10 } = req.query;
     const skip = (pageNum - 1) * pageLimit;
@@ -57,35 +37,8 @@ export const getAllBlogs = async (req, res) => {
   }
 };
 
-export const updateBlog = async (req, res) => {
+export const getBlogByIdForWeb = async (req, res) => {
   try {
-    const updatedBlog = await Blog.findByIdAndUpdate(req.params.id, req.body);
-
-    if (!updatedBlog) {
-      return res.json({
-        status: false,
-        message: "Blog not found!",
-        data: null,
-      });
-    }
-
-    res.json({
-      status: true,
-      message: "Blog updated successfully!",
-      data: updatedBlog,
-    });
-  } catch (error) {
-    res.json({
-      status: false,
-      message: error.message,
-      data: null,
-    });
-  }
-};
-
-export const getBlogById = async (req, res) => {
-  try {
-    // const blog = await Blog.findById(req.params.id);
     const [blog] = await Blog.aggregate([
       {
         $match: {
@@ -122,41 +75,7 @@ export const getBlogById = async (req, res) => {
   }
 };
 
-export const deleteBlog = async (req, res) => {
-  try {
-    const deletedBlog = await Blog.findByIdAndDelete(req.params.id);
-    const imageUrl = new DeleteObjectCommand({
-      Bucket: process.env.BUCKET_NAME,
-      Key: deletedBlog.imageUrl,
-    });
-    await s3.send(imageUrl);
-    const params = new DeleteObjectCommand({
-      Bucket: process.env.BUCKET_NAME,
-      Key: deletedBlog.videoUrl,
-    });
-    await s3.send(params);
-    if (!deletedBlog) {
-      return res.json({
-        status: false,
-        message: "Blog not found!",
-        data: null,
-      });
-    }
-    res.json({
-      status: true,
-      message: "Blog deleted successfully!",
-      data: deletedBlog,
-    });
-  } catch (error) {
-    res.json({
-      status: false,
-      message: error.message,
-      data: null,
-    });
-  }
-};
-
-export const getRecommendedBlogs = async (req, res) => {
+export const getRecommendedBlogsForWeb = async (req, res) => {
   try {
     const blog = await Blog.findById(req.params.id);
 
@@ -177,10 +96,12 @@ export const getRecommendedBlogs = async (req, res) => {
         },
       },
       {
+        $limit: 6,
+      },
+      {
         $project: {
           title: 1,
-          imageUrl: 1,
-          videoUrl: 1,
+          description: 1,
         },
       },
     ]);
@@ -192,8 +113,7 @@ export const getRecommendedBlogs = async (req, res) => {
       message: isEmpty
         ? "No related blogs found!"
         : "Blog fetched successfully!",
-      relatedBlogs,
-      blog,
+      data: relatedBlogs,
     });
   } catch (error) {
     res.json({
