@@ -10,7 +10,7 @@ import {
 import { authMiddleware } from "../middlewares/index.js";
 
 const blogRouter = express.Router();
-blogRouter.post("/:id/recommended", getRecommendedBlogs);
+blogRouter.get("/:id/recommended", getRecommendedBlogs);
 
 blogRouter.use(authMiddleware);
 blogRouter.post("/", createBlog);
