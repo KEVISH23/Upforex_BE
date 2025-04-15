@@ -42,7 +42,7 @@ export const getBlogByIdForWeb = async (req, res) => {
     const [blog] = await Blog.aggregate([
       {
         $match: {
-          _id: new mongoose.Types.ObjectId(req.params.id),
+          permaLink: req.params.id,
         },
       },
       {
@@ -77,7 +77,7 @@ export const getBlogByIdForWeb = async (req, res) => {
 
 export const getRecommendedBlogsForWeb = async (req, res) => {
   try {
-    const blog = await Blog.findById(req.params.id);
+    const blog = await Blog.findOne({ permaLink: req.params.id });
 
     const relatedBlogs = await Blog.aggregate([
       {
@@ -102,6 +102,7 @@ export const getRecommendedBlogsForWeb = async (req, res) => {
         $project: {
           title: 1,
           description: 1,
+          permaLink: 1,
         },
       },
     ]);

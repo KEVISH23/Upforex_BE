@@ -25,7 +25,6 @@ const blogSchema = new mongoose.Schema(
     },
     videoUrl: {
       type: String,
-      trim: true,
     },
     textField: {
       type: String,
@@ -43,6 +42,13 @@ const blogSchema = new mongoose.Schema(
     },
     tags: {
       type: [String],
+    },
+    permaLink: {
+      type: String,
+      unique: true,
+    },
+    featuredImage: {
+      type: String,
     },
   },
   { timestamps: true }
