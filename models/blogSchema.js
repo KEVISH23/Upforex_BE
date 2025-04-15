@@ -47,7 +47,7 @@ const blogSchema = new mongoose.Schema(
       type: String,
       unique: true,
     },
-    featuredImage: {
+    featuredImageUrl: {
       type: String,
     },
   },
