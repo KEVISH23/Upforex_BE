@@ -125,16 +125,7 @@ export const getBlogById = async (req, res) => {
 export const deleteBlog = async (req, res) => {
   try {
     const deletedBlog = await Blog.findByIdAndDelete(req.params.id);
-    const imageUrl = new DeleteObjectCommand({
-      Bucket: process.env.BUCKET_NAME,
-      Key: deletedBlog.imageUrl,
-    });
-    await s3.send(imageUrl);
-    const params = new DeleteObjectCommand({
-      Bucket: process.env.BUCKET_NAME,
-      Key: deletedBlog.videoUrl,
-    });
-    await s3.send(params);
+
     if (!deletedBlog) {
       return res.json({
         status: false,
@@ -142,6 +133,29 @@ export const deleteBlog = async (req, res) => {
         data: null,
       });
     }
+    if (deletedBlog.imageUrl) {
+      const imageUrl = new DeleteObjectCommand({
+        Bucket: process.env.BUCKET_NAME,
+        Key: deletedBlog.imageUrl,
+      });
+      await s3.send(imageUrl);
+    }
+    if (deletedBlog.featuredImageUrl) {
+      const featuredImageUrl = new DeleteObjectCommand({
+        Bucket: process.env.BUCKET_NAME,
+        Key: deletedBlog.featuredImageUrl,
+      });
+      await s3.send(featuredImageUrl);
+    }
+
+    if (deletedBlog.videoUrl) {
+      const videoUrl = new DeleteObjectCommand({
+        Bucket: process.env.BUCKET_NAME,
+        Key: deletedBlog.videoUrl,
+      });
+      await s3.send(videoUrl);
+    }
+
     res.json({
       status: true,
       message: "Blog deleted successfully!",
