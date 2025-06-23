@@ -5,6 +5,7 @@ import cors from "cors";
 import { adminRouter, blogRouter, categoryRouter } from "./routes/index.js";
 import axios from "axios";
 import "./dbConnect.js";
+import { generateSitemap } from "./sitemapGenerator.js";
 dotenv.config();
 const app = express();
 app.use(cors());
@@ -63,6 +64,17 @@ app.use("/api/v1/upforex/contact-us", async (req, res) => {
     res.status(500).json({ status: false, message: error.message });
   }
 });
+app.get("/sitemap.xml", async (req, res) => {
+  try {
+    const sitemap = await generateSitemap();
+    res.header("Content-Type", "application/xml");
+    res.send(sitemap);
+  } catch (err) {
+    res.status(500).send("Error generating sitemap");
+  }
+});
+app.use("/robots.txt", express.static("public/robots.txt"));
+
 app.use((err, req, res, next) => {
   res.status(500).json({
     status: false,
