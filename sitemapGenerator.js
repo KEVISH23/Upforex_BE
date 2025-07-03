@@ -72,7 +72,7 @@ export async function generateSitemap() {
 
   blogs.forEach((blog) => {
     links.push({
-      url: `/blog/${blog.permaLink}`,
+      url: `/blogs/${blog.permaLink}`,
       changefreq: "weekly",
       priority: 0.8,
       lastmodISO: blog.updatedAt.toISOString(),
