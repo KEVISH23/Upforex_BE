@@ -2,7 +2,7 @@ import express from "express";
 import * as nodemailer from "./nodemailer.js";
 import dotenv from "dotenv";
 import cors from "cors";
-import { adminRouter, blogRouter, categoryRouter,termsRouter,} from "./routes/index.js";
+import { adminRouter, blogRouter, categoryRouter,termsRouter} from "./routes/index.js";
 import axios from "axios";
 import "./dbConnect.js";
 import { generateSitemap } from "./sitemapGenerator.js";
