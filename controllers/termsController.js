@@ -46,7 +46,19 @@ export const getAllTerms = async (req, res) => {
 // Create new terms version
 export const createTerms = async (req, res) => {
   try {
+    console.log('req.admin:', req.admin); // Debug log
+    console.log('req.user:', req.user); // Debug log
+    
     const { version, title, content, isActive = false } = req.body;
+    
+    if (!req.admin || !req.admin._id) {
+      return res.status(400).json({
+        status: false,
+        message: "Admin authentication failed",
+        data: null,
+      });
+    }
+    
     const modifiedBy = req.admin._id; // From auth middleware
 
     // Validate version format (v[major].[minor] where minor is 0-9)
