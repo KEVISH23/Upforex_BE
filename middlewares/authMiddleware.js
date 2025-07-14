@@ -24,7 +24,9 @@ export const authMiddleware = async (req, res, next) => {
 
   try {
     const decoded = verifyToken(token);
+    console.log("Decoded token:", decoded); // Debug log
     const admin = await Admin.findById(decoded.id);
+    console.log("Found admin:", admin ? "Yes" : "No"); // Debug log
 
     if (!admin) {
       return res.status(401).json({
@@ -34,6 +36,8 @@ export const authMiddleware = async (req, res, next) => {
       });
     }
     req.user = decoded;
+    req.admin = admin;
+    console.log("Admin set in req:", !!req.admin); // Debug log
     next();
   } catch (error) {
     res.status(401).json({
