@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 import { Blog } from "./models/index.js";
 dotenv.config();
 
-const BASE_URL = process.env.BASE_URL || "https://upforex.com";
+const BASE_URL = process.env.BASE_URL || "https://www.upforex.com";
 
 export async function generateSitemap() {
   const links = [
