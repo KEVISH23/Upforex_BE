@@ -16,8 +16,8 @@ const userRouter = express.Router();
 
 
 userRouter.post("/", verifyFixedToken, registerUser);
-userRouter.get("/public", verifyFixedToken, getAllUsersPublic);
-userRouter.get("/public/id/:id", verifyFixedToken, getUserByIdPublic);
+// userRouter.get("/public", verifyFixedToken, getAllUsersPublic);
+// userRouter.get("/public/id/:id", verifyFixedToken, getUserByIdPublic);
 userRouter.get("/public/email/:email", verifyFixedToken, getUserByEmailPublic);
 
 
