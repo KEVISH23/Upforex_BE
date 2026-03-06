@@ -151,15 +151,15 @@ export const registerUser = async (req, res) => {
     }
 
     
-    const existingPhone = await User.findOne({ phoneNo });
-    if (existingPhone) {
-      return res.status(400).json({
-        success: false,
-        status: 0,
-        message: "User with this phone number already exists",
-        timestamp: new Date().toISOString(),
-      });
-    }
+    // const existingPhone = await User.findOne({ phoneNo });
+    // if (existingPhone) {
+    //   return res.status(400).json({
+    //     success: false,
+    //     status: 0,
+    //     message: "User with this phone number already exists",
+    //     timestamp: new Date().toISOString(),
+    //   });
+    // }
 
 
     const userData = {
@@ -334,14 +334,9 @@ export const updateUser = async (req, res) => {
   }
 };
 
-
 export const deleteUser = async (req, res) => {
   try {
-    const user = await User.findByIdAndUpdate(
-      req.params.id,
-      { isActive: false },
-      { new: true },
-    );
+    const user = await User.findByIdAndDelete(req.params.id);
 
     if (!user) {
       return res.status(404).json({
@@ -353,8 +348,14 @@ export const deleteUser = async (req, res) => {
 
     res.json({
       status: true,
-      message: "User deactivated successfully",
-      data: user,
+      message: "User deleted permanently",
+      data: {
+        userId: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        deletedAt: new Date().toISOString(),
+      },
     });
   } catch (error) {
     res.status(500).json({
@@ -364,7 +365,6 @@ export const deleteUser = async (req, res) => {
     });
   }
 };
-
 
 export const getAllUsersPublic = async (req, res) => {
   try {
