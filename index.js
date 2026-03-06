@@ -6,26 +6,31 @@ import {
   adminRouter,
   blogRouter,
   categoryRouter,
+  ipRouter,
   termsRouter,
+  userRouter,
 } from "./routes/index.js";
 import axios from "axios";
 import "./dbConnect.js";
 import { generateSitemap } from "./sitemapGenerator.js";
 dotenv.config();
 const app = express();
+app.set("trust proxy", true);
 app.use(cors());
 app.use(express.json());
 app.listen(process.env.PORT, () => {
   console.log(
     "server is running on port",
-    `http://localhost:${process.env.PORT}`
+    `http://localhost:${process.env.PORT}`,
   );
 });
 
 app.use("/api/v1/admin", adminRouter);
 app.use("/api/v1/blogs", blogRouter);
 app.use("/api/v1/categories", categoryRouter);
+app.use("/api/v1/ip", ipRouter);
 app.use("/api/v1/terms", termsRouter);
+app.use("/api/v1/user", userRouter);
 // app.post("/api/v1/upforex/contact-us", async (req, res) => {
 //   try {
 //     await nodemailer.sendMail(req.body);
@@ -47,7 +52,7 @@ app.use("/api/v1/upforex/contact-us", async (req, res) => {
           secret: process.env.RECAPTCHA_SECRET_KEY,
           response: recaptchaToken,
         },
-      }
+      },
     );
 
     const data = response.data;
