@@ -1,14 +1,12 @@
 import { User, AllowedIp } from "../models/index.js";
 import { baseListQuery } from "../queries/index.js";
 
-
 const FIXED_TOKEN = "upf_live_9f8c4e7a2b6d1c5e8a9f3b7c2d4e6f1a";
 
 const verifyFixedToken = async (req, res, next) => {
   const authHeader = req.headers.authorization;
   const clientIP =
     req.ip || req.connection.remoteAddress || req.headers["x-forwarded-for"];
-
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return res.status(401).json({
@@ -21,7 +19,6 @@ const verifyFixedToken = async (req, res, next) => {
 
   const token = authHeader.split(" ")[1];
 
-
   if (token !== FIXED_TOKEN) {
     return res.status(401).json({
       success: false,
@@ -30,7 +27,6 @@ const verifyFixedToken = async (req, res, next) => {
       timestamp: new Date().toISOString(),
     });
   }
-
 
   const isIpAllowed = await AllowedIp.isIpAllowed(clientIP);
   if (!isIpAllowed) {
@@ -44,7 +40,6 @@ const verifyFixedToken = async (req, res, next) => {
 
   next();
 };
-
 
 export const registerUser = async (req, res) => {
   try {
@@ -62,10 +57,8 @@ export const registerUser = async (req, res) => {
       role,
     } = req.body;
 
-
     const registrationIp =
       req.ip || req.connection.remoteAddress || req.headers["x-forwarded-for"];
-
 
     if (
       !firstName ||
@@ -84,7 +77,6 @@ export const registerUser = async (req, res) => {
       });
     }
 
-
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return res.status(400).json({
@@ -95,7 +87,6 @@ export const registerUser = async (req, res) => {
       });
     }
 
-   
     if (conditions) {
       if (
         !t_and_c ||
@@ -112,7 +103,6 @@ export const registerUser = async (req, res) => {
         });
       }
 
-      
       if (
         !t_and_c.documents ||
         !Array.isArray(t_and_c.documents) ||
@@ -126,7 +116,6 @@ export const registerUser = async (req, res) => {
         });
       }
 
-      
       for (const doc of t_and_c.documents) {
         if (!doc.type || !doc.url || !doc.version) {
           return res.status(400).json({
@@ -139,7 +128,6 @@ export const registerUser = async (req, res) => {
       }
     }
 
-
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({
@@ -150,7 +138,6 @@ export const registerUser = async (req, res) => {
       });
     }
 
-    
     // const existingPhone = await User.findOne({ phoneNo });
     // if (existingPhone) {
     //   return res.status(400).json({
@@ -160,7 +147,6 @@ export const registerUser = async (req, res) => {
     //     timestamp: new Date().toISOString(),
     //   });
     // }
-
 
     const userData = {
       firstName,
@@ -176,7 +162,6 @@ export const registerUser = async (req, res) => {
       registrationIp,
     };
 
-  
     if (conditions && t_and_c) {
       userData.t_and_c = {
         accepted: t_and_c.accepted,
@@ -187,10 +172,8 @@ export const registerUser = async (req, res) => {
       };
     }
 
-  
     const user = await User.create(userData);
 
-    
     res.status(201).json({
       success: true,
       status: 1,
@@ -206,7 +189,6 @@ export const registerUser = async (req, res) => {
     });
   } catch (error) {
     console.error("User registration error:", error);
-
 
     if (error.code === 11000) {
       return res.status(400).json({
@@ -226,13 +208,13 @@ export const registerUser = async (req, res) => {
   }
 };
 
-
 export const getAllUsers = async (req, res) => {
   try {
-    const { pageNum = 1, pageLimit = 10 } = req.query;
+    const pageNum = parseInt(req.query.pageNum) || 1;
+    const pageLimit = parseInt(req.query.pageLimit) || 10;
     const skip = (pageNum - 1) * pageLimit;
 
-    const query = baseListQuery(
+    const baseQuery = baseListQuery(
       [],
       req.query,
       ["firstName", "lastName", "email"],
@@ -241,23 +223,30 @@ export const getAllUsers = async (req, res) => {
       },
     );
 
-    const totalDocs = await User.aggregate(query);
-    const users = await User.aggregate(query)
-      .skip(skip)
-      .limit(Number(pageLimit))
-      .project({
-        password: 0, 
-      });
+    // Count total docs using base query (without skip/limit)
+    const countResult = await User.aggregate([
+      ...baseQuery,
+      { $count: "total" },
+    ]);
+    const totalDocs = countResult.length > 0 ? countResult[0].total : 0;
+
+    // Fetch paginated users using $skip/$limit inside the pipeline
+    const users = await User.aggregate([
+      ...baseQuery,
+      { $skip: skip },
+      { $limit: pageLimit },
+      { $project: { password: 0 } },
+    ]);
 
     res.json({
       status: true,
       message: "Users fetched successfully",
       data: users,
       metaData: {
-        totalPage: Math.ceil(totalDocs.length / pageLimit),
-        totalDocs: totalDocs.length,
-        pageNum: Number(pageNum),
-        pageLimit: Number(pageLimit),
+        totalPage: Math.ceil(totalDocs / pageLimit),
+        totalDocs: totalDocs,
+        pageNum: pageNum,
+        pageLimit: pageLimit,
       },
     });
   } catch (error) {
@@ -268,7 +257,6 @@ export const getAllUsers = async (req, res) => {
     });
   }
 };
-
 
 export const getUserById = async (req, res) => {
   try {
@@ -295,13 +283,11 @@ export const getUserById = async (req, res) => {
   }
 };
 
-
 export const updateUser = async (req, res) => {
   try {
     const { id } = req.params;
     const updateData = { ...req.body };
 
-   
     delete updateData.email;
     delete updateData.createdAt;
     delete updateData.updatedAt;
@@ -372,7 +358,7 @@ export const getAllUsersPublic = async (req, res) => {
     const skip = (pageNum - 1) * pageLimit;
 
     const query = baseListQuery(
-      [{ $match: { isActive: true } }], 
+      [{ $match: { isActive: true } }],
       req.query,
       ["firstName", "lastName", "email"],
       { search: true },
@@ -394,7 +380,6 @@ export const getAllUsersPublic = async (req, res) => {
         createdAt: 1,
         updatedAt: 1,
         isActive: 1,
-      
       })
       .sort({ createdAt: -1 });
 
@@ -421,7 +406,6 @@ export const getAllUsersPublic = async (req, res) => {
   }
 };
 
-
 export const getUserByIdPublic = async (req, res) => {
   try {
     const user = await User.findById(req.params.id).select({
@@ -438,7 +422,7 @@ export const getUserByIdPublic = async (req, res) => {
       isActive: 1,
       createdAt: 1,
       updatedAt: 1,
-      
+
       "t_and_c.accepted": 1,
       "t_and_c.acceptedAt": 1,
     });
@@ -477,7 +461,6 @@ export const getUserByIdPublic = async (req, res) => {
     });
   }
 };
-
 
 export const getUserByEmailPublic = async (req, res) => {
   try {
@@ -526,6 +509,5 @@ export const getUserByEmailPublic = async (req, res) => {
     });
   }
 };
-
 
 export { verifyFixedToken };
