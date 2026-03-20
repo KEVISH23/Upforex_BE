@@ -50,8 +50,35 @@ const blogSchema = new mongoose.Schema(
     featuredImageUrl: {
       type: String,
     },
+    customScripts: {
+      type: [
+        {
+          scriptName: {
+            type: String,
+            trim: true,
+            required: true,
+          },
+          scriptContent: {
+            type: String,
+            required: true,
+          },
+          scriptType: {
+            type: String,
+            enum: ["inline", "external", "json-ld"],
+            default: "inline",
+            description:
+              "inline = JavaScript code | external = URL | json-ld = JSON object (string)",
+          },
+          isActive: {
+            type: Boolean,
+            default: true,
+          },
+        },
+      ],
+      default: [],
+    },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 const Blog = mongoose.model("Blog", blogSchema);
 export { Blog };

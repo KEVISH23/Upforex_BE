@@ -8,8 +8,54 @@ import {
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 import s3 from "../s3Config.js";
 
+// Helper function to generate script HTML for View Source visibility
+const generateScriptHTML = (scripts) => {
+  if (!scripts || !Array.isArray(scripts) || scripts.length === 0) {
+    return "";
+  }
+
+  return scripts
+    .filter((script) => script.isActive)
+    .map((script, index) => {
+      if (script.scriptType === "inline") {
+        return `<script id="custom-script-inline-${index}" type="text/javascript">${script.scriptContent}</script>`;
+      } else if (script.scriptType === "external") {
+        const src = script.scriptContent.includes("src=")
+          ? script.scriptContent.match(/src=["']([^"']+)["']/)?.[1]
+          : script.scriptContent.trim();
+        return `<script id="custom-script-external-${index}" type="text/javascript" src="${src}" async></script>`;
+      } else if (script.scriptType === "json-ld") {
+        return `<script id="custom-script-json-ld-${index}" type="application/ld+json">${script.scriptContent}</script>`;
+      }
+      return "";
+    })
+    .filter((html) => html)
+    .join("\n");
+};
+
+// Validate and clean custom scripts
+const validateCustomScripts = (scripts) => {
+  if (!scripts || !Array.isArray(scripts)) {
+    return [];
+  }
+
+  return scripts.map((script) => ({
+    scriptName: String(script.scriptName || "").trim(),
+    scriptContent: String(script.scriptContent || "").trim(),
+    scriptType: ["inline", "external", "json-ld"].includes(script.scriptType)
+      ? script.scriptType
+      : "inline",
+    isActive: Boolean(script.isActive),
+  }));
+};
+
 export const createBlog = async (req, res) => {
   try {
+    // Validate and clean custom scripts
+    if (req.body.customScripts) {
+      req.body.customScripts = validateCustomScripts(req.body.customScripts);
+    }
+
     const blog = await Blog.create(req.body);
     if (!blog) throw new Error("Error in creating Blob");
     res.json({
@@ -59,7 +105,14 @@ export const getAllBlogs = async (req, res) => {
 
 export const updateBlog = async (req, res) => {
   try {
-    const updatedBlog = await Blog.findByIdAndUpdate(req.params.id, req.body);
+    // Validate and clean custom scripts
+    if (req.body.customScripts) {
+      req.body.customScripts = validateCustomScripts(req.body.customScripts);
+    }
+
+    const updatedBlog = await Blog.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+    });
 
     if (!updatedBlog) {
       return res.json({
@@ -108,10 +161,15 @@ export const getBlogById = async (req, res) => {
         data: null,
       });
     }
+
+    // Generate script HTML for View Source visibility
+    const scriptHTML = generateScriptHTML(blog.customScripts);
+
     res.json({
       status: true,
       message: "Blog fetched successfully!",
       data: blog,
+      scriptHTML: scriptHTML, // For SSR or direct HTML injection
     });
   } catch (error) {
     res.json({

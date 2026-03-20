@@ -6,6 +6,31 @@ import {
   blogsQuery,
 } from "../queries/index.js";
 
+// Helper function to generate script HTML for View Source visibility
+const generateScriptHTML = (scripts) => {
+  if (!scripts || !Array.isArray(scripts) || scripts.length === 0) {
+    return "";
+  }
+
+  return scripts
+    .filter((script) => script.isActive)
+    .map((script, index) => {
+      if (script.scriptType === "inline") {
+        return `<script id="custom-script-inline-${index}" type="text/javascript">${script.scriptContent}</script>`;
+      } else if (script.scriptType === "external") {
+        const src = script.scriptContent.includes("src=")
+          ? script.scriptContent.match(/src=["']([^"']+)["']/)?.[1]
+          : script.scriptContent.trim();
+        return `<script id="custom-script-external-${index}" type="text/javascript" src="${src}" async></script>`;
+      } else if (script.scriptType === "json-ld") {
+        return `<script id="custom-script-json-ld-${index}" type="application/ld+json">${script.scriptContent}</script>`;
+      }
+      return "";
+    })
+    .filter((html) => html)
+    .join("\n");
+};
+
 export const getAllBlogsForWeb = async (req, res) => {
   try {
     const { pageNum = 1, pageLimit = 10 } = req.query;
@@ -61,10 +86,15 @@ export const getBlogByIdForWeb = async (req, res) => {
         data: null,
       });
     }
+
+    // Generate script HTML for View Source visibility
+    const scriptHTML = generateScriptHTML(blog.customScripts);
+
     res.json({
       status: true,
       message: "Blog fetched successfully!",
       data: blog,
+      scriptHTML: scriptHTML, // For SSR or direct HTML injection
     });
   } catch (error) {
     res.json({
